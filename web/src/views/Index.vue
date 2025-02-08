@@ -1,0 +1,377 @@
+<template>
+  <div class="index">
+    <!-- 选择地址区域 -->
+    <div class="select-container">
+      <div class="title">请选择云厂商</div>
+      <div class="yun-complate">阿里云</div>
+    </div>
+    
+    <!-- 选择上传到哪个文件夹 -->
+    <div class="select-container">
+      <div class="title">选择上传路径</div>
+      <div class="yun-path">https://img1.liangtian.me/blog/images/</div>
+    </div>
+
+
+    <!-- 上传区域 -->
+    <div class="upload-container">
+      <el-upload
+        class="upload-area"
+        drag
+        action="#"
+        :auto-upload="false"
+        :show-file-list="false"
+      >
+        <div class="upload-content">
+          <i class="el-icon-upload"></i>
+          <div class="upload-text">请上传文件</div>
+        </div>
+      </el-upload>
+
+    
+    </div>
+
+    <!-- 上传完成后文件路径显示区域 -->
+    <div class="file-path-container">
+      <el-input
+        v-model="filePath"
+        class="path-input"
+        :placeholder="'请上传文件，服务器路径将在此显示'"
+      >
+        <template #append>
+          <el-button type="primary" @click="copyFilePath" :disabled="!filePath">
+            <i class="el-icon-document-copy"></i>
+            复制路径
+          </el-button>
+        </template>
+      </el-input>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// 从 Vue 中导入 ref 响应式引用
+import { ref } from 'vue'
+// 导入 Element Plus 的消息提示组件
+import { ElMessage } from 'element-plus'
+
+// 新增上传路径选项
+const uploadPaths = [
+  { label: '主目录', value: '/main' },
+  { label: '图片目录', value: '/images' },
+  { label: '文档目录', value: '/documents' },
+  { label: '视频目录', value: '/videos' }
+]
+
+const selectedPath = ref('')
+
+// 创建一个响应式引用，用于存储文件路径
+// 初始值为空字符串
+const filePath = ref('')
+
+// 定义复制文件路径的异步函数
+const copyFilePath = async () => {
+  try {
+    // 使用 Clipboard API 将文件路径复制到剪贴板
+    await navigator.clipboard.writeText(filePath.value)
+    // 复制成功后显示成功提示消息
+    ElMessage.success('路径已复制到剪贴板')
+  } catch (err) {
+    // 如果复制过程出现错误，显示错误提示消息
+    ElMessage.error('复制失败，请手动复制')
+  }
+}
+</script>
+
+<style scoped>
+.index {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;  /* 改为纵向排列 */
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.select-container {
+  width: 80vw;           /* 与上传区域保持同宽 */
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.upload-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  margin: 20px;
+}
+
+/* 上传区域的外层容器，用于居中定位上传组件 */
+.upload-area {
+  width: 80vw;           
+  min-width: 300px;     /* 修改最小宽度，适应移动端 */
+  max-width: 1200px;    /* 新增最大宽度限制 */
+  height: 300px;        
+}
+
+/* Element Plus上传组件的拖拽区域样式自定义 */
+:deep(.el-upload-dragger) {
+  width: 100%;              
+  height: 300px !important; /* 减小高度从300px到200px */
+  display: flex;            /* 使用弹性布局，便于内容居中 */
+  align-items: center;      /* 内容垂直居中 */
+  justify-content: center;  /* 内容水平居中 */
+  border: 4px dashed #B3D8FF;  /* 虚线边框，提供视觉引导 */
+  border-radius: 12px;      /* 圆角边框，提升视觉体验 */
+  background: rgba(179, 216, 255, 0.03);  /* 轻微的背景色，区分上传区域 */
+  transition: all 0.5s;     /* 添加过渡效果，使状态变化更平滑 */
+  position: relative;       /* 为动画效果提供定位上下文 */
+  overflow: hidden;         /* 隐藏超出部分，主要用于动画效果 */
+}
+
+/* 创建流动动画效果的光效 */
+:deep(.el-upload-dragger)::before {
+  content: '';             /* 创建伪元素 */
+  position: absolute;      /* 绝对定位，相对于父元素 */
+  top: 0;
+  left: -100%;            /* 初始位置在可视区域左侧 */
+  width: 100%;
+  height: 100%;
+  /* 创建渐变效果，形成流动的光带 */
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(179, 216, 255, 0.2),
+    transparent
+  );
+  animation: flow 3s infinite;  /* 应用流动动画，无限循环 */
+}
+
+/* 定义流动动画关键帧 */
+@keyframes flow {
+  0% { left: -100%; }     /* 动画开始：在左侧不可见区域 */
+  50% { left: 100%; }     /* 动画中点：移动到右侧 */
+  100% { left: 100%; }    /* 动画结束：保持在右侧 */
+}
+
+/* 鼠标悬停时的交互效果 */
+:deep(.el-upload-dragger:hover) {
+  border-color: #B3D8FF;   /* 加深边框颜色 */
+  background: rgba(179, 216, 255, 0.08);  /* 增加背景不透明度 */
+  transform: scale(1.02);   /* 轻微放大效果 */
+  box-shadow: 0 0 30px rgba(179, 216, 255, 0.3);  /* 添加发光效果 */
+}
+
+/* 上传内容区域（图标和文字的容器） */
+.upload-content {
+  text-align: center;      /* 文字居中对齐 */
+}
+
+/* 上传图标样式 */
+.upload-content i {
+  font-size: 80px;        /* 设置图标大小 */
+  color: #409EFF;         /* 设置图标颜色为主题蓝 */
+  margin-bottom: 20px;    /* 与下方文字保持间距 */
+  transition: all 0.3s;    /* 添加过渡效果 */
+}
+
+/* 鼠标悬停时图标的动画效果 */
+:deep(.el-upload-dragger:hover) .upload-content i {
+  transform: scale(1.1) translateY(-5px);  /* 放大并向上浮动 */
+  color: #79bbff;         /* 图标颜色变浅 */
+}
+
+/* 上传区域的提示文字样式 */
+.upload-text {
+  font-size: 28px;        /* 设置文字大小 */
+  color: #409EFF;         /* 文字颜色与图标保持一致 */
+  font-weight: 500;       /* 适中的文字粗细 */
+  transition: all 0.3s;    /* 添加过渡效果 */
+}
+
+/* 鼠标悬停时文字的动画效果 */
+:deep(.el-upload-dragger:hover) .upload-text {
+  transform: scale(1.05);  /* 轻微放大效果 */
+  color: #79bbff;         /* 文字颜色变浅 */
+}
+
+/* 文件路径容器样式 */
+.file-path-container {
+  min-width: 300px;       /* 修改最小宽度 */
+  max-width: 1200px;      /* 新增最大宽度限制 */
+  width:80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px 10px;
+  margin-top: 20px;
+  width: 90vw;
+}
+
+/* 路径输入框样式 */
+.path-input {
+  --el-input-height: 60px;
+  font-size: 20px;
+}
+
+:deep(.path-input .el-input__wrapper) {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0 20px;
+}
+
+/* 路径输入框的按钮组样式 */
+:deep(.path-input .el-input-group__append) {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* 复制按钮样式优化 */
+:deep(.path-input .el-button) {
+  height: 60px;
+  padding: 0 30px;
+  font-size: 18px;
+  font-weight: 500;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(135deg, #409EFF, #79bbff);
+  color: white;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+:deep(.path-input .el-button:hover) {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #66b1ff, #8cc5ff);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
+  color:#fff;
+}
+
+:deep(.path-input .el-button:active) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.4);
+}
+
+:deep(.path-input .el-button:disabled) {
+  background: #c0c4cc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+:deep(.path-input .el-button i) {
+  margin-right: 4px;
+  font-size: 20px;
+}
+
+/* 新增选择地址区域样式 */
+.title {
+  font-size: 28px;
+    color: #2d6cdf;
+    font-weight: 500;
+    position: relative;
+    padding-left: 15px;
+}
+.title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(120deg, #2d6cdf 0%, #4c89f0 100%);
+    border-radius: 2px;
+}
+
+.path-select {
+  width: 200px;
+}
+
+:deep(.path-select .el-input__wrapper) {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.custom-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-option i {
+  color: #409EFF;
+  font-size: 18px;
+}
+
+/* 修改移动端适配 */
+@media screen and (max-width: 768px) {
+  .select-container {
+    width: 90vw;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .upload-area {
+    height: 200px;      /* 移动端减小高度 */
+  }
+
+  :deep(.el-upload-dragger) {
+    height: 200px !important;
+  }
+
+  .upload-content i {
+    font-size: 50px;    /* 减小图标大小 */
+    margin-bottom: 10px;
+  }
+
+  .upload-text {
+    font-size: 20px;    /* 减小文字大小 */
+  }
+
+  .file-path-container {
+    bottom: 100px;      /* 调整位置 */
+  }
+
+  .path-input {
+    --el-input-height: 45px;  /* 减小输入框高度 */
+    font-size: 16px;          /* 调整字体大小 */
+  }
+
+  :deep(.path-input .el-button) {
+    height: 45px;             /* 匹配输入框高度 */
+    padding: 0 15px;          /* 减小按钮内边距 */
+    font-size: 14px;          /* 调整按钮字体大小 */
+  }
+
+  :deep(.path-input .el-button i) {
+    font-size: 16px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .path-select {
+    width: 100%;
+  }
+}
+</style>
