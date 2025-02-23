@@ -9,7 +9,7 @@ import axios from 'axios'
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(router)
-app.config.globalProperties.$axios = axios
 
-// axios.defaults.baseURL = 'http://your-api-base-url'
 app.mount('#app')
+
+

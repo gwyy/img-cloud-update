@@ -9,12 +9,12 @@
                 :rules="rules"
                 ref="formRef"
             >
-                <el-form-item label="请填写appid" prop="appid">
-                    <el-input class="setting-input" v-model="formData.appid" />
+                <el-form-item label="请填写ac_id" label-width="150px" prop="access_key_id">
+                    <el-input class="setting-input" v-model="formData.access_key_id" />
                 </el-form-item>
 
-                <el-form-item label="请填写ac" prop="ac">
-                    <el-input class="setting-input" v-model="formData.ac" />
+                <el-form-item label="请填写ac_secret" label-width="150px" prop="access_key_secret">
+                    <el-input class="setting-input" v-model="formData.access_key_secret" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="setting-button" @click="submitForm">提交</el-button>
@@ -25,35 +25,54 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { getAliyunSecret, saveAliyunSecret } from '@/api/system'
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 
-
-const formRef = ref(null)
-const formData = reactive({
-    appid: '',
-    ac: ''
+const formData = ref({
+    access_key_id: '',
+    access_key_secret: ''
 })
 
-const rules = {
-    appid: [
-        { required: true, message: '请输入appid', trigger: 'blur' }
+const rules = ref({
+    access_key_id: [
+        { required: true, message: '请填写ac_id', trigger: 'blur' }
     ],
-    ac: [
-        { required: true, message: '请输入ac', trigger: 'blur' }
+    access_key_secret: [
+        { required: true, message: '请填写ac_secret', trigger: 'blur' }
     ]
+})
+
+const formRef = ref(null)
+
+//提交表单
+const submitForm = async () => {
+    formRef.value.validate( async (valid) => {
+        if (valid) {
+            const res = await saveAliyunSecret(formData.value)
+            if (res.code === 0) {
+                ElMessage({
+                    type: 'success',
+                    message: '修改成功！',
+                    showClose: true
+                })
+            }
+        }
+    })
 }
 
-const submitForm = async () => {
-    if (!formRef.value) return
-    
-    try {
-        await formRef.value.validate()
-        // TODO: 这里添加提交逻辑
-        console.log('表单提交成功', formData)
-    } catch (error) {
-        console.error('表单验证失败')
+//初始化表单
+const initFormData = async () => {
+    const  res = await getAliyunSecret()
+    if (res.code  == 0) {
+        formData.value = res.data
     }
 }
+initFormData()
+
+
+
+
 </script>
 
 <style scoped>
