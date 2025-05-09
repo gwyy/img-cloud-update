@@ -1,12 +1,11 @@
 package config
 
 type Config struct {
-	Mode      string    `yaml:"mode" mapstructure:"mode"`
-	Version   string    `yaml:"version" mapstructure:"version"`
-	Gin       Gin       `yaml:"gin" mapstructure:"gin"`
-	BboltDB   BboltDB   `yaml:"bbolt_db" mapstructure:"bbolt_db"`
-	Log       Log       `yaml:"log" mapstructure:"log"`
-	AliyunOSS AliyunOSS `yaml:"aliyunoss" mapstructure:"aliyunoss"`
+	Mode    string  `yaml:"mode" mapstructure:"mode"`
+	Version string  `yaml:"version" mapstructure:"version"`
+	Gin     Gin     `yaml:"gin" mapstructure:"gin"`
+	BboltDB BboltDB `yaml:"bbolt_db" mapstructure:"bbolt_db"`
+	Log     Log     `yaml:"log" mapstructure:"log"`
 }
 
 type BboltDB struct {
@@ -33,12 +32,4 @@ type Log struct {
 	MaxAge     int    `yaml:"max-age" mapstructure:"max-age"`
 	MaxBackups int    `yaml:"max-backups" mapstructure:"max-backups"`
 	Compress   bool   `yaml:"compress" mapstructure:"compress"`
-}
-
-type AliyunOSS struct {
-	EndPoint        string `yaml:"end_point" mapstructure:"end_point"`
-	AccessKeyID     string `yaml:"access_key_id" mapstructure:"access_key_id"`
-	AccessKeySecret string `yaml:"access_key_secret" mapstructure:"access_key_secret"`
-	BucketName      string `yaml:"bucket_name" mapstructure:"bucket_name"`
-	RegionID        string `yaml:"region_id" mapstructure:"region_id"`
 }

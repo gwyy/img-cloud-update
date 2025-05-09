@@ -9,11 +9,19 @@
                 :rules="rules"
                 ref="formRef"
             >
-                <el-form-item label="请填写ac_id" label-width="150px" prop="access_key_id">
+                <el-form-item label="请填写region" label-width="250px" prop="region">
+                    <el-input class="setting-input" v-model="formData.region" />
+                </el-form-item>
+
+                <el-form-item label="请填写bucket" label-width="250px" prop="bucket">
+                    <el-input class="setting-input" v-model="formData.bucket" />
+                </el-form-item>
+
+                <el-form-item label="请填写access_key_id" label-width="250px" prop="access_key_id">
                     <el-input class="setting-input" v-model="formData.access_key_id" />
                 </el-form-item>
 
-                <el-form-item label="请填写ac_secret" label-width="150px" prop="access_key_secret">
+                <el-form-item label="请填写access_key_secret" label-width="250px" prop="access_key_secret">
                     <el-input class="setting-input" v-model="formData.access_key_secret" />
                 </el-form-item>
                 <el-form-item>
@@ -30,16 +38,24 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const formData = ref({
+    region: '',
+    bucket: '',
     access_key_id: '',
     access_key_secret: ''
 })
 
 const rules = ref({
+    region: [
+        { required: true, message: '请填写region', trigger: 'blur' }
+    ],
+    bucket: [
+        { required: true, message: '请填写bucket', trigger: 'blur' }
+    ],
     access_key_id: [
-        { required: true, message: '请填写ac_id', trigger: 'blur' }
+        { required: true, message: '请填写access_key_id', trigger: 'blur' }
     ],
     access_key_secret: [
-        { required: true, message: '请填写ac_secret', trigger: 'blur' }
+        { required: true, message: '请填写access_key_secret', trigger: 'blur' }
     ]
 })
 
@@ -69,8 +85,6 @@ const initFormData = async () => {
     }
 }
 initFormData()
-
-
 
 
 </script>

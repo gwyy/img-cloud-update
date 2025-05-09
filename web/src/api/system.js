@@ -1,5 +1,18 @@
 import http from '@/utils/request'
 
+
+// 上传图片
+export const uploadImage = (data) => {
+  return http({
+    url: "/base/uploadImage",
+    method: "POST",
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
 // 获取阿里云密钥
 export const getAliyunSecret = () => {
   return http({

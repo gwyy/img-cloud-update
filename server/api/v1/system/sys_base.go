@@ -51,3 +51,19 @@ func (a *BaseApi) GetAliyunSecret(c *gin.Context) {
 	}
 	response.OkWithData(secret, c)
 }
+
+// @Tags Base
+// @Summary 上传文件
+// @Accept json
+// @Produce json
+// @Param file formData file true "文件"
+// @Success 200 {object} response.Response
+func (a *BaseApi) UploadImage(c *gin.Context) {
+	//获取上传文件
+	_, header, err := c.Request.FormFile("file")
+	if err != nil {
+		response.FailWithMessage("获取上传文件失败："+err.Error(), c)
+		return
+	}
+
+}

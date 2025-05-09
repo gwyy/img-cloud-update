@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	"github.com/gwyy/img-cloud-update/server/config"
 	"github.com/spf13/viper"
 	"go.etcd.io/bbolt"
@@ -12,4 +13,5 @@ var (
 	Vp      *viper.Viper
 	Log     *zap.SugaredLogger
 	BboltDB *bbolt.DB
+	Oss     *oss.Client
 )

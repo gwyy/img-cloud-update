@@ -9,7 +9,10 @@
     <!-- 选择上传到哪个文件夹 -->
     <div class="select-container">
       <div class="title">选择上传路径</div>
-      <div class="yun-path">https://img1.liangtian.me/blog/images/</div>
+      <div class="yun-path">
+        <span>https://img1.liangtian.me/</span>
+        <el-input class="update-path" v-model="formData.path" placeholder="请输入路径" />
+      </div>
     </div>
 
 
@@ -18,9 +21,14 @@
       <el-upload
         class="upload-area"
         drag
+        ref="uploadRef"
         action="#"
+        accept="image/*"
         :auto-upload="false"
+        :limit="1"
         :show-file-list="false"
+        :on-change="handleFileChange"
+        :on-exceed="handleExceed"
       >
         <div class="upload-content">
           <i class="el-icon-upload"></i>
@@ -54,21 +62,73 @@
 import { ref } from 'vue'
 // 导入 Element Plus 的消息提示组件
 import { ElMessage } from 'element-plus'
+import { uploadImage } from '@/api/system'
 
-// 新增上传路径选项
-const uploadPaths = [
-  { label: '主目录', value: '/main' },
-  { label: '图片目录', value: '/images' },
-  { label: '文档目录', value: '/documents' },
-  { label: '视频目录', value: '/videos' }
-]
+const formData = ref({
+  path: 'myblog/imgs/auto/',
+})
+// 创建 file 输入框的 ref 引用变量
+const uploadRef = ref(null);
 
-const selectedPath = ref('')
 
-// 创建一个响应式引用，用于存储文件路径
-// 初始值为空字符串
+// 超过文件数量限制的回调
+const handleExceed = () => {
+  ElMessage.warning('只能上传一张图片，请替换当前图片')
+}
+
+
+// 文件选择后的回调
+const handleFileChange = async (file) => {
+  // 可在这里添加文件验证逻辑
+  if (file.size > 10000 * 1024) {
+    ElMessage.error('文件大小不能超过 10MB')
+     // 清空已选择的文件
+     if (uploadRef.value) {
+      uploadRef.value.rawFiles = []
+    }
+    return
+  }
+  if(formData.value.path == "") {
+    ElMessage.error('请选择上传路径')
+     // 清空已选择的文件
+     if (uploadRef.value) {
+      uploadRef.value.rawFiles = []
+    }
+    return
+  }
+
+   // 确保只保留最新文件
+   if (uploadRef.value) {
+    uploadRef.value.rawFiles = [file]
+  }
+
+  // 构造 FormData
+  const formDataToSend = new FormData()
+  formDataToSend.append('file', uploadRef.value.rawFiles[0])
+  formDataToSend.append('path', formData.value.path)
+  console.log(formDataToSend)
+  //发送请求 
+  try {
+    // 使用 axios 发送请求
+    const response = await uploadImage(formDataToSend)
+    ElMessage.success('上传成功')
+    console.log('服务器响应:', response.data)
+  } catch (error) {
+    ElMessage.error('上传失败')
+    console.error('上传错误:', error)
+  }
+
+  // 清空文件和表单
+  if (uploadRef.value) {
+    uploadRef.value.rawFiles = []
+  }
+  formData.value.path = ""
+}
+
+
+
+// 文件路径
 const filePath = ref('')
-
 // 定义复制文件路径的异步函数
 const copyFilePath = async () => {
   try {
@@ -373,5 +433,15 @@ const copyFilePath = async () => {
   .path-select {
     width: 100%;
   }
+}
+
+.yun-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.update-path {
+  width: 200px;
 }
 </style>

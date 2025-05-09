@@ -13,5 +13,6 @@ func (a *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) {
 		BaseRouter.GET("health", baseApi.HealthCheck)
 		BaseRouter.POST("saveAliyunSecret", baseApi.SaveAliyunSecret)
 		BaseRouter.GET("getAliyunSecret", baseApi.GetAliyunSecret)
+		BaseRouter.POST("uploadImage", baseApi.UploadImage)
 	}
 }

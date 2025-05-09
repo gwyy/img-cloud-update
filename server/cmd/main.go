@@ -27,6 +27,8 @@ func main() {
 	if global.BboltDB != nil {
 		defer global.BboltDB.Close()
 	}
+	// 初始化阿里云oss
+	initialize.InitAliyunOss()
 	// 初始化服务
 	initialize.InitServer()
 }
