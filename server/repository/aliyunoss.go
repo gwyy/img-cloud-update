@@ -1,12 +1,24 @@
 package repository
 
 import (
+	"context"
+	"errors"
+	"mime/multipart"
+
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/credentials"
 	"github.com/gwyy/img-cloud-update/server/global"
 	"github.com/gwyy/img-cloud-update/server/model/api/system/request"
 	"github.com/gwyy/img-cloud-update/server/pkg/bbolt_manager"
 )
+
+func GetAliyunOssBucket() string {
+	bucket, err := bbolt_manager.Get(global.Conf.BboltDB.TableName, "bucket")
+	if err != nil {
+		return ""
+	}
+	return bucket
+}
 
 /**
 * @description: 获取阿里云oss配置
@@ -52,4 +64,67 @@ func InitAliyunOss() (*oss.Client, error) {
 
 	// 创建OSS客户端
 	return oss.NewClient(cfg), nil
+}
+
+/**
+* @description: 上传文件
+* @param {context.Context} ctx
+* @param {*multipart.FileHeader} file
+* @return {response.FileDownload, error}
+ */
+func UploadFile(ctx context.Context, bucketName string, objectName string, file *multipart.FileHeader) (string, error) {
+	if global.Oss == nil {
+		global.Log.Error("阿里云oss未初始化")
+		return "", errors.New("阿里云oss未初始化")
+	}
+	if bucketName == "" {
+		global.Log.Error("bucketName为空")
+		return "", errors.New("bucketName为空")
+	}
+	if objectName == "" {
+		global.Log.Error("objectName为空")
+		return "", errors.New("objectName为空")
+	}
+	// 读取本地文件。
+	f, openError := file.Open()
+	if openError != nil {
+		return "", errors.New("读取不到文件内容！")
+	}
+	defer f.Close() // 创建文件 defer 关闭
+	// 创建上传对象的请求
+	putRequest := &oss.PutObjectRequest{
+		Bucket:       oss.Ptr(bucketName),      // 存储空间名称
+		Key:          oss.Ptr(objectName),      // 对象名称
+		StorageClass: oss.StorageClassStandard, // 指定对象的存储类型为标准存储
+		Acl:          oss.ObjectACLPrivate,     // 指定对象的访问权限为私有访问
+		Body:         f,
+	}
+
+	// 执行上传对象的请求
+	_, err := global.Oss.PutObject(ctx, putRequest)
+	if err != nil {
+		global.Log.Errorf("上传文件失败 %v", err)
+		return "", err
+	}
+	return objectName, nil
+}
+
+func DeleteFile(ctx context.Context, bucketName string, objectName string) error {
+	if global.Oss == nil {
+		global.Log.Error("阿里云oss未初始化")
+		return errors.New("阿里云oss未初始化")
+	}
+	// 创建删除对象的请求
+	request := &oss.DeleteObjectRequest{
+		Bucket: oss.Ptr(bucketName), // 存储空间名称
+		Key:    oss.Ptr(objectName), // 对象名称
+	}
+	global.Log.Info("删除文件", bucketName)
+	global.Log.Info("删除文件", objectName)
+	// 执行删除对象的操作并处理结果
+	_, err := global.Oss.DeleteObject(ctx, request)
+	if err != nil {
+		global.Log.Errorf("删除文件失败 %v", err)
+	}
+	return nil
 }

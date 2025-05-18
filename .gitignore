@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 config.yaml
+server/logs
+server/config.yaml
+server/config.db
+
 
 # Editor directories and files
 .vscode/*

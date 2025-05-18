@@ -14,14 +14,14 @@ func InitDB() {
 	db, err := bbolt_manager.OpenDB(dbPath)
 	if err != nil {
 		global.Log.Error("初始化数据库失败", err)
+		return
 	}
-	global.Log.Info("初始化数据库成功")
-
 	//初始化表
 	initTable(db)
-
 	// 设置全局数据库
 	global.BboltDB = db
+	global.Log.Info("初始化数据库成功")
+
 }
 
 func initTable(db *bbolt.DB) {

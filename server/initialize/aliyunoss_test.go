@@ -24,7 +24,7 @@ func TestAliyunOssInit(t *testing.T) {
 }
 
 func TDeleteObject(objectName string) {
-	client := NewClient()
+	client := TNewClient()
 	// 创建删除对象的请求
 	request := &oss.DeleteObjectRequest{
 		Bucket: oss.Ptr(bucketName), // 存储空间名称
@@ -42,7 +42,7 @@ func TDeleteObject(objectName string) {
 }
 
 func TAddObject(objectName string, localFile string) {
-	client := NewClient()
+	client := TNewClient()
 	// 创建上传对象的请求
 	putRequest := &oss.PutObjectRequest{
 		Bucket:       oss.Ptr(bucketName),      // 存储空间名称

@@ -1,139 +1,223 @@
 <template>
   <div class="index">
-    <!-- 选择地址区域 -->
-    <div class="select-container">
-      <div class="title">请选择云厂商</div>
-      <div class="yun-complate">阿里云</div>
-    </div>
-    
-    <!-- 选择上传到哪个文件夹 -->
-    <div class="select-container">
-      <div class="title">选择上传路径</div>
-      <div class="yun-path">
-        <span>https://img1.liangtian.me/</span>
-        <el-input class="update-path" v-model="formData.path" placeholder="请输入路径" />
+    <el-form :model="formData" ref="formRef" :rules="rules">
+
+      <!-- 选择地址区域 -->
+      <div class="select-container">
+        <div class="title">请选择云厂商</div>
+        <div class="yun-complate">阿里云</div>
       </div>
-    </div>
-
-
-    <!-- 上传区域 -->
-    <div class="upload-container">
-      <el-upload
-        class="upload-area"
-        drag
-        ref="uploadRef"
-        action="#"
-        accept="image/*"
-        :auto-upload="false"
-        :limit="1"
-        :show-file-list="false"
-        :on-change="handleFileChange"
-        :on-exceed="handleExceed"
-      >
-        <div class="upload-content">
-          <i class="el-icon-upload"></i>
-          <div class="upload-text">请上传文件</div>
+      
+      <!-- 选择上传到哪个文件夹 -->
+      <div class="select-container">
+        <div class="title">选择上传路径</div>
+        <div class="yun-path">
+          <span>https://img1.liangtian.me/</span>
+          <el-input class="update-path" v-model="formData.path"  placeholder="请输入路径" />
         </div>
-      </el-upload>
+      </div>
 
-    
-    </div>
 
-    <!-- 上传完成后文件路径显示区域 -->
-    <div class="file-path-container">
-      <el-input
-        v-model="filePath"
-        class="path-input"
-        :placeholder="'请上传文件，服务器路径将在此显示'"
-      >
-        <template #append>
-          <el-button type="primary" @click="copyFilePath" :disabled="!filePath">
-            <i class="el-icon-document-copy"></i>
-            复制路径
-          </el-button>
-        </template>
-      </el-input>
-    </div>
+      <!-- 上传区域 -->
+      <div class="upload-container">
+        <el-upload
+          class="upload-area"
+          drag
+          ref="uploadRef"
+          action="#"
+          accept="image/*"
+          :auto-upload="false"
+          :show-file-list="false"
+          :http-request="handleUpload"
+          :on-change="handleFileChange"
+        >
+          <div class="upload-content">
+            <i class="el-icon-upload"></i>
+            <div class="upload-text">请上传文件</div>
+          </div>
+        </el-upload>
+      </div>
+
+      <!-- 缩略图显示区域 -->
+      <div class="thumbnail-container">
+        <div class="thumbnail-list">
+        
+          <div class="thumbnail-item" v-for="(image, index) in uploadedImages" :key="index" >
+            <div class="thumbnail-wrapper">
+              <img :src="image.url" @click="openImage(image.url)" alt="图片">
+              <div class="thumbnail-actions">
+                <el-button type="danger" size="small" @click="onDeleteImage(image.name)">
+                  <el-icon  class="el-icon-delete" >
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <!-- 上传完成后文件路径显示区域 -->
+      <div class="file-path-container">
+        <el-input
+          v-model="serverFileName"
+          class="path-input"
+          :placeholder="'请上传文件，服务器路径将在此显示'"
+        >
+          <template #append>
+            <el-button type="primary" @click="copyFilePath" :disabled="!serverFileName">
+              <i class="el-icon-document-copy"></i>
+              复制路径
+            </el-button>
+          </template>
+        </el-input>
+      </div>
+    </el-form>
   </div>
 </template>
 
 <script setup>
 // 从 Vue 中导入 ref 响应式引用
-import { ref } from 'vue'
+import { ref,reactive } from 'vue'
 // 导入 Element Plus 的消息提示组件
 import { ElMessage } from 'element-plus'
-import { uploadImage } from '@/api/system'
+import { uploadImage,deleteImage } from '@/api/system'
 
-const formData = ref({
-  path: 'myblog/imgs/auto/',
+
+// 表单引用
+const formRef = ref(null)
+const uploadRef = ref(null)
+
+// 控制是否第一次上传
+const isFirstUpload = ref(true)
+//上传回调地址
+const serverFileName = ref('')
+
+//获取今年
+const date = new Date().getFullYear()
+
+//上传的图片列表
+const uploadedImages = ref([])
+
+
+// 二次构造的表单数据
+const formData = reactive({
+  path: 'auto/'+date+'/',
+  file: null
 })
-// 创建 file 输入框的 ref 引用变量
-const uploadRef = ref(null);
+
+// 表单校验规则
+const rules = reactive({
+  path: [{ required: true, message: '请输入路径', trigger: 'blur' }],
+  file: [{ required: true, message: '请上传文件', trigger: 'change' }]
+})
 
 
-// 超过文件数量限制的回调
-const handleExceed = () => {
-  ElMessage.warning('只能上传一张图片，请替换当前图片')
+// 打开图片
+const openImage = (url) => {
+  window.open(url, '_blank')
 }
 
 
-// 文件选择后的回调
+
+// 文件选择后的处理
 const handleFileChange = async (file) => {
-  // 可在这里添加文件验证逻辑
-  if (file.size > 10000 * 1024) {
-    ElMessage.error('文件大小不能超过 10MB')
-     // 清空已选择的文件
-     if (uploadRef.value) {
-      uploadRef.value.rawFiles = []
+  formData.file = file.raw
+  if (isFirstUpload.value) {
+    isFirstUpload.value = false
+    try {
+      // 触发表单验证
+      await formRef.value.validate()
+      // 手动触发上传
+      await uploadRef.value.submit()
+    } catch (error) {
+      ElMessage.error('表单验证失败')
+      isFirstUpload.value = true // 验证失败时允许下次重试
     }
-    return
   }
-  if(formData.value.path == "") {
-    ElMessage.error('请选择上传路径')
-     // 清空已选择的文件
-     if (uploadRef.value) {
-      uploadRef.value.rawFiles = []
-    }
+}
+
+// 上传文件
+const handleUpload = async () => {
+  if(isFirstUpload.value) {
     return
   }
 
-   // 确保只保留最新文件
-   if (uploadRef.value) {
-    uploadRef.value.rawFiles = [file]
-  }
+  // 创建 FormData 对象
+  const form = new FormData()
+  form.append('path', formData.path)
+  form.append('file', formData.file)
 
-  // 构造 FormData
-  const formDataToSend = new FormData()
-  formDataToSend.append('file', uploadRef.value.rawFiles[0])
-  formDataToSend.append('path', formData.value.path)
-  console.log(formDataToSend)
+
   //发送请求 
   try {
     // 使用 axios 发送请求
-    const response = await uploadImage(formDataToSend)
-    ElMessage.success('上传成功')
-    console.log('服务器响应:', response.data)
+    const response = await uploadImage(form)
+    if (response.code === 0) {
+      ElMessage.success('上传成功')
+      //存储上传地址
+      serverFileName.value = "![]("+response.data.url+")"
+      // 添加新上传的图片到缩略图列表
+      addThumbnail(response.data.url,response.data.name)
+    
+      console.log('服务器响应:', response.data)
+    } else {
+      ElMessage.error('上传失败')
+    }
   } catch (error) {
     ElMessage.error('上传失败')
     console.error('上传错误:', error)
   }
 
   // 清空文件和表单
-  if (uploadRef.value) {
-    uploadRef.value.rawFiles = []
+  // 清空表单
+  formRef.value.resetFields()
+  uploadRef.value.clearFiles()
+  formData.file = null
+  isFirstUpload.value = true // 重置为允许下次上传
+}
+
+
+//添加缩略图
+const addThumbnail = (url,name) => {
+  //判断长度 超过10个就去掉最后一个
+  if(uploadedImages.value.length >= 10){
+    uploadedImages.value.shift()
   }
-  formData.value.path = ""
+  uploadedImages.value.push({
+    url: url,
+    name: name
+  })
+}
+
+
+// 删除图片
+const onDeleteImage = async (name) => {
+  if (name == "") {
+    return
+  }
+  console.log(name)
+  //发送请求 删除图片
+  const response = await deleteImage(name)
+  if (response.code === 0) {
+    ElMessage.success('删除成功')
+    //删除缩略图
+    uploadedImages.value = uploadedImages.value.filter(item => item.name !== name)
+    //清空file
+    serverFileName.value = ''
+  } else {
+    ElMessage.error('删除失败')
+  }
 }
 
 
 
-// 文件路径
-const filePath = ref('')
 // 定义复制文件路径的异步函数
 const copyFilePath = async () => {
   try {
     // 使用 Clipboard API 将文件路径复制到剪贴板
-    await navigator.clipboard.writeText(filePath.value)
+    await navigator.clipboard.writeText(serverFileName.value)
     // 复制成功后显示成功提示消息
     ElMessage.success('路径已复制到剪贴板')
   } catch (err) {
@@ -443,5 +527,83 @@ const copyFilePath = async () => {
 
 .update-path {
   width: 200px;
+}
+
+/* 缩略图容器样式 */
+.thumbnail-container {
+  width: 80vw;
+  max-width: 1200px;
+  margin: 10px auto 0 auto;
+  padding: 0px;
+}
+
+.thumbnail-list {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center; /* 水平居中 */
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0 ;
+}
+
+.thumbnail-item {
+  flex: 0 0 auto;
+  width: 100px;
+}
+
+.thumbnail-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail-wrapper img:hover {
+  transform: scale(1.05);
+}
+
+.thumbnail-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnail-wrapper:hover .thumbnail-actions {
+  opacity: 1;
+}
+
+.thumbnail-actions .el-button {
+  padding: 4px 8px;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .thumbnail-container {
+    width: 90vw;
+  }
+
+  .thumbnail-item {
+    width: 80px;
+  }
 }
 </style>

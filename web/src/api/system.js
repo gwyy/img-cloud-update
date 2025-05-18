@@ -13,6 +13,15 @@ export const uploadImage = (data) => {
   })
 }
 
+// 删除图片
+export const deleteImage = (name) => {
+  return http({
+    url: "/base/deleteImage",
+    method: "POST",
+    data: { name: name },
+  })
+}
+
 // 获取阿里云密钥
 export const getAliyunSecret = () => {
   return http({
