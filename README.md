@@ -32,6 +32,5 @@ docker run -d --name img-cloud-update -p 8888:8888 -v ./data:/app/data -v ./logs
 
 
 参考项目：
-- https://github.com/zhoufanglu/simple-maker
-- https://github.com/etcd-io/bbolt
+- https://github.com/etcd-io/bbolt  二进制文本数据库
 - https://help.aliyun.com/zh/oss/developer-reference/quick-start-for-oss-go-sdk-v2?spm=a2c4g.11186623.0.0.4ac75a05vzGr7u  oss go v2 sdk
