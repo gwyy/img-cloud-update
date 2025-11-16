@@ -28,7 +28,7 @@
 ## 安装
 1. docker直接安装：
 ```bash
-docker run -d --name img-cloud-update -p 8888:8888 -v ./data:/app/data -v ./logs:/app/logs img-cloud-update
+docker run -d --name img-cloud-update -p 6872:6872 -v ./data:/app/data -v ./logs:/app/logs img-cloud-update:latest
 ```
 
 
