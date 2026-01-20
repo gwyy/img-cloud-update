@@ -13,7 +13,7 @@ import (
 func main() {
 	//获取配置文件
 	var configFile string
-	flag.StringVar(&configFile, "conf", "data/config.yaml", "config file path")
+	flag.StringVar(&configFile, "conf", "./config.yaml", "config file path")
 	flag.Parse()
 
 	// 初始化配置

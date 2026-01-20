@@ -3,6 +3,7 @@ module github.com/gwyy/img-cloud-update/server
 go 1.23.1
 
 require (
+	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.2
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.10.0
@@ -13,7 +14,6 @@ require (
 )
 
 require (
-	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.2 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

@@ -39,7 +39,7 @@ const router = useRouter()
 
 //判断是否安装
 const checkInstall = async () => {
-    const res = await isInstall()
+    const res = await isInstall()    
     if (res.code === 0) {
         if (res.data.isInstall === "true") {
             router.push('/login')

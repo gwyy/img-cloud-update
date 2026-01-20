@@ -8,7 +8,7 @@ gin:
   port: 4123
   timeout: 5
   pprof: true
-  prefix: "/api"
+  prefix: ""
   readtimeout: "1s"
   writetimeout: "1s"
 
