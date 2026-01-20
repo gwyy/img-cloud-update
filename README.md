@@ -17,9 +17,9 @@
 - [ ] aws/腾讯云/七牛等更多远程仓库
 
 ### 截图
-![](https://imgur.com/1kA2Bav)
+https://imgur.com/1kA2Bav
 
-![](https://imgur.com/gIbloDS)
+https://imgur.com/gIbloDS
 
 
 ## 依赖组件：
