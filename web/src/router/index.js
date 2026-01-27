@@ -60,7 +60,7 @@ router.beforeEach(async (to, from, next) => {
   if (res.code === 0) {
       if (res.data.isInstall === "false") {
         tokenStore.logout()
-        next({ name: 'Install' ,query: { redirect: to.fullPath }}); // 去安装
+        return next({ name: 'Install' ,query: { redirect: to.fullPath }}); // 去安装
     } else {
         // 如果路由不需要认证，直接放行
         if (!to.meta.requiresAuth) {
@@ -68,14 +68,14 @@ router.beforeEach(async (to, from, next) => {
         }
       //判断是否登录，登录后初始化表单
       if (!tokenStore.isLogin()) {  
-        next({ name: 'Login' ,query: { redirect: to.fullPath }}); // 未登录，跳转到登录页，
+        return next({ name: 'Login' ,query: { redirect: to.fullPath }}); // 未登录，跳转到登录页，
       }
     }
   } else { //安装报错
     //无脑退出登录
     tokenStore.logout()
     alert(res.message)
-    next({ name: 'Install',query: { redirect: to.fullPath } }); // 去安装
+    return next({ name: 'Install',query: { redirect: to.fullPath } }); // 去安装
   }
   next();
 })
