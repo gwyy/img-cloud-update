@@ -12,7 +12,7 @@ build : build-image
 
 # 镜像打包
 build-image:
-	docker build -t ${IMAGE_NAME}:${TAGS_OPT} -f deploy/Dockerfile .
+	docker build --platform linux/amd64,linux/arm64 -t ${IMAGE_NAME}:${TAGS_OPT} -f deploy/Dockerfile .
 
 # 本地编译前端
 build-web-local:

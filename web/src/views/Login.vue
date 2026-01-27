@@ -33,17 +33,17 @@ const tokenStore = useTokenStore()
 
 
 //检查是否安装
-const checkInstall = async () => {
-    const res = await isInstall()
-    if (res.code === 0) {
-        if (res.data.isInstall === "false") {
-            router.push('/install')
-        }
-    } else {
-        ElMessage.error(res.message)
-    }
-}
- checkInstall()
+// const checkInstall = async () => {
+//     const res = await isInstall()
+//     if (res.code === 0) {
+//         if (res.data.isInstall === "false") {
+//             router.push('/Install')
+//         }
+//     } else {
+//         ElMessage.error(res.message)
+//     }
+// }
+//  checkInstall()
 
 
 
@@ -65,7 +65,7 @@ const login = () => {
             if (res.code === 0) {
                 // 保存token
                 tokenStore.login(form.value.password)
-                router.push('/index')
+                router.push('Index')
             } else {
                 ElMessage.error(res.message)
             }

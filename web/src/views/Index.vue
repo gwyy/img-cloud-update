@@ -630,7 +630,7 @@ const copyFilePath = async (url) => {
 .thumbnail-visual {
   position: relative;
   width: 100%;
- 
+
   overflow: hidden;
 }
 
@@ -642,7 +642,7 @@ const copyFilePath = async (url) => {
 .thumbnail-visual :deep(img) {
   object-fit: cover;
   width: 100%;
-  height: auto;
+  height: 100px;
   object-fit: contain; /* 或者 cover，看你想要的效果 */
 
 }

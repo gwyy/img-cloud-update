@@ -28,16 +28,17 @@ WORKDIR /opt/img-cloud-update
 ENV LANG=en_US.utf8
 # 安装运行时依赖
 RUN apk add --no-cache nginx musl-locales bash
+RUN rm -f /etc/nginx/http.d/default.conf
 # 复制 entrypoint 和其他配置文件（假设 deploy/ 和 server/ 在项目根目录）
 COPY deploy/entrypoint.sh /opt/img-cloud-update/entrypoint.sh
 COPY server/config.yaml /opt/img-cloud-update/server/config.yaml
 COPY server/data /opt/img-cloud-update/server/data/
-COPY deploy/nginx.conf /etc/nginx/http.d/nginx.conf
+COPY deploy/default.conf /etc/nginx/http.d/default.conf
 # 从构建阶段复制产物
 COPY --from=build-web /build/web/dist/ /opt/img-cloud-update/web/
 COPY --from=build-server /build/server/server /opt/img-cloud-update/server/server
 # 设置权限和 locale
 RUN echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && chmod +x ./entrypoint.sh
+    && chmod +x ./entrypoint.sh 
 EXPOSE 80
 ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]

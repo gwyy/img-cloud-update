@@ -37,29 +37,27 @@ const logout = () => {
     router.push('/login')
 }
 
+// //检查是否安装
+// const checkInstall = async () => {
+//     const res = await isInstall()
+//     if (res.code === 0) {
+//         if (res.data.isInstall === "false") {
+//             router.push('/install')
+//         }
+//     } else {
+//         ElMessage.error(res.message)
+//     }
+// }
+// checkInstall()
 
 
-//检查是否安装
-const checkInstall = async () => {
-    const res = await isInstall()
-    if (res.code === 0) {
-        if (res.data.isInstall === "false") {
-            router.push('/install')
-        }
-    } else {
-        ElMessage.error(res.message)
-    }
-}
-checkInstall()
-
-
-// 检查登录状态
-const checkLogin =  () => {
-    if (!tokenStore.isLogin()) {
-        router.push('/login')
-    } 
-}
-checkLogin()
+// // 检查登录状态
+// const checkLogin =  () => {
+//     if (!tokenStore.isLogin()) {
+//         router.push('/login')
+//     } 
+// }
+// checkLogin()
 
 
 

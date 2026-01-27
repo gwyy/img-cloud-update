@@ -16,8 +16,8 @@ pinia.use(piniaPluginPersistedstate)
 
 const app = createApp(App)
 app.use(pinia)
-app.use(ElementPlus)
 app.use(router)
+app.use(ElementPlus)
 app.config.globalProperties.$http = axios
 //注册icon
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

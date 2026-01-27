@@ -34,6 +34,7 @@ http.interceptors.response.use(
       // 跳转登录页或提示
       console.error('未授权，请重新登录');
     }
+     console.error('请求出错：', error.response?.data?.message || error.message);
     return Promise.reject(error);
   }
 );

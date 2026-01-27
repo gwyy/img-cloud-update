@@ -14,7 +14,7 @@
                     <p>基础信息配置:</p>
                 </el-alert>
                 <el-form-item label="登录密码" label-width="250px" prop="sys_password">
-                    <el-input class="setting-input" type="text" v-model="formData.sys_password" />
+                    <el-input class="setting-input" type="password" v-model="formData.sys_password" />
                 </el-form-item>
                 
                 <el-form-item label="请填写host地址" label-width="250px" prop="host">
@@ -55,11 +55,11 @@
                 </el-form-item>
 
                 <el-form-item label="请填写access_key_id" label-width="250px" prop="access_key_id">
-                    <el-input class="setting-input" v-model="formData.access_key_id" />
+                    <el-input class="setting-input" type="password" v-model="formData.access_key_id" />
                 </el-form-item>
 
                 <el-form-item label="请填写access_key_secret" label-width="250px" prop="access_key_secret">
-                    <el-input class="setting-input" v-model="formData.access_key_secret" />
+                    <el-input class="setting-input" type="password" v-model="formData.access_key_secret" />
                 </el-form-item>
                
             </el-space>
@@ -76,6 +76,7 @@
 import { getAliyunSecret, saveAliyunSecret } from '@/api/system'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+
 
 const formData = ref({
     region: '',
@@ -160,6 +161,7 @@ const initFormData = async () => {
         formData.value = res.data
     }
 }
+
 initFormData()
 
 
